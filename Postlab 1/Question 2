@@ -1,0 +1,51 @@
+import matplotlib.pyplot as plt
+from sense_hat import SenseHat
+from time import sleep
+import time
+
+sense=SenseHat()
+sense.clear()
+
+Points=[]
+temperatures=[]
+tempAvges = []
+tempRaw=[]
+
+#slidingwindow length
+def runAvg(temperatures):
+    sum = 0
+    for i in temperatures:
+        sum+= i
+
+    return sum/len(temperatures)
+
+
+for i in range(0,250):
+    #store time information
+    time_per_step = 0.05
+    Points.append((i+1)*time_per_step)
+    newTemp=sense.get_temperature()
+    
+    temperatures.append(newTemp)
+    if (len(temperatures) > 11):
+        temperatures.pop(0)
+    
+    toPrint = runAvg(temperatures)
+    
+    #for plotting
+    tempRaw.append(newTemp)
+    tempAvges.append(toPrint)
+        
+    print(str(i + 1) +"avg temp is " + str(toPrint) )
+    print("read temp is " + str(newTemp)+"\n")
+    
+    time.sleep(time_per_step)
+    
+#data plotting
+plt.plot(Points, tempRaw, label="Raw Temperatures")
+plt.plot(Points, tempAvges, label="Averaged Temperatures")
+plt.ylabel("Temperature (C)")
+plt.xlabel("Time (s)")
+plt.legend()
+plt.show()
+
